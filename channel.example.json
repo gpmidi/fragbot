@@ -1,0 +1,15 @@
+{
+    "prefix":"!",
+    "lfg":{
+        "channel_id":"561331308933021696",
+        "platforms":[
+            "pc",
+            "xbox",
+            "ps4",
+            "switch"
+        ]
+    },
+    "rtd":{
+        "channel_id":"570765155793633280"
+    }
+}
