@@ -1,5 +1,5 @@
 # fragbot
-The goland based discord bot for fragforce
+The golang based discord bot for fragforce
 
 ## Customizable Settings
 * chat command prefix
