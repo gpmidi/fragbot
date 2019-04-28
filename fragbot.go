@@ -20,6 +20,8 @@ var (
 	users    players
 	platfms  platforms
 	shutdown = make(chan string)
+	//ServStat is the Service Status channel
+	servStat = make(chan string)
 )
 
 type botConfig struct {
@@ -109,6 +111,8 @@ func main() {
 	// start discord handling
 	go startDiscordHandler()
 
+	<-servStat
+
 	log.Printf("Bot is now running.  Press CTRL-C send 'shutdown' to exit.")
 	reader := bufio.NewReader(os.Stdin)
 	for {
@@ -160,6 +164,8 @@ func startDiscordHandler() {
 	}
 
 	log.Printf("invite the bot to your server with https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot", bot.ID)
+
+	servStat <- "discord_online"
 
 	// ticker for lfg checks
 	ticker := time.NewTicker(15 * time.Second)
