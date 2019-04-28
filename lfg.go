@@ -307,7 +307,7 @@ func loadPlatforms() error {
 		return fmt.Errorf("there was an issue reading the platform file %s", err)
 	}
 
-	log.Printf("%s", platfms.Platforms)
+	// log.Printf("%s", platfms.Platforms)
 
 	var platConf platformInfo
 	var platArray []string
