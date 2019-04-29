@@ -208,14 +208,14 @@ func handleDiscordMessages(s *discordgo.Session, message *discordgo.MessageCreat
 		var response string
 		var sendToDM bool
 		if strings.HasPrefix(messageContent, chn.Prefix+"lfg") && message.ChannelID == chn.LFG.ChannelID {
-			if strings.TrimPrefix(messageContent, chn.Prefix+"lfg") == "" {
+			if strings.TrimPrefix(messageContent, chn.Prefix+"lfg") == "" || !strings.HasPrefix(messageContent, chn.Prefix+"lfg ") {
 				sendDiscordMessage(s, channel.ID, "How to use Fragfinder v1.0\n`!lfg (Game) (Platform) (Wait Time in minutes (Default is 60 if not set))`")
 				return
 			}
 			response, sendToDM = lookingForGroup(strings.TrimPrefix(messageContent, chn.Prefix+"lfg "), message.Author.ID, message.Author.Username)
 		}
 		if strings.HasPrefix(messageContent, chn.Prefix+"roll") && message.ChannelID == chn.RTD.ChannelID {
-			if strings.TrimPrefix(messageContent, chn.Prefix+"roll") == "" {
+			if strings.TrimPrefix(messageContent, chn.Prefix+"roll") == "" || !strings.HasPrefix(messageContent, chn.Prefix+"roll ") {
 				sendDiscordMessage(s, channel.ID, "How to use Fragfinder v1.0\n`!lfg (Game) (Platform) (Wait Time in minutes (Default is 60 if not set))`")
 				return
 			}
