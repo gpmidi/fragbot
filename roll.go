@@ -65,16 +65,19 @@ func rollTheDice(message string) (response string, sendToDM bool) {
 	}
 
 	log.Printf("rolling a %d sided die %d times", dieValue, rollCount)
-	for rtdi, val := range roll(rollCount, dieValue) {
+	allRolls := roll(rollCount, dieValue)
+	for rtdi, val := range allRolls {
 		prettyRolls = prettyRolls + strconv.Itoa(val)
-		if rtdi == len(roll(rollCount, dieValue))-2 {
+		if rtdi == len(allRolls)-2 {
 			prettyRolls = prettyRolls + ", and "
-		} else if rtdi != len(roll(rollCount, dieValue))-1 {
+		} else if rtdi != len(allRolls)-1 {
 			prettyRolls = prettyRolls + ", "
 		}
 	}
 
-	rollTotal := total(roll(rollCount, dieValue))
+	rollTotal := total(allRolls)
+
+	log.Printf("%d", rollTotal)
 
 	if dieInfo[3] == "" || dieInfo[4] == "" {
 		log.Printf("No profeciency was added to the roll")
