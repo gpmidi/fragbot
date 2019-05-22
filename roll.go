@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"regexp"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -22,24 +22,35 @@ func rollTheDice(message string) (response string, sendToDM bool) {
 	var err error
 
 	// rolls that are sent back
-	var rolls []int
+	var prettyRolls string
+
+	// a users proficiency
+	var proficiency int
+	var profString string
 
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	log.Printf("roll the dice")
-	// Example !roll 1d6
-	// Example 50d10
-	dice := strings.Split(message, "d")
-	rollCount, err := strconv.Atoi(dice[0])
+	// Example !roll 1d6+2
+	validID, _ := regexp.Compile(`(\d+)\s?d\s?(\d+)\s?(?:(\+|\-)\s?(\d*))?`)
+
+	dieInfo := validID.FindStringSubmatch(message)
+
+	dieValue, err := strconv.Atoi(dieInfo[2])
 	if err != nil {
-		response = fmt.Sprintf("bad format on the dice count")
-		sendToDM = false
+		log.Printf("There was an error converting the number of sides")
 	}
 
-	dieValue, err := strconv.Atoi(dice[1])
+	rollCount, err := strconv.Atoi(dieInfo[1])
 	if err != nil {
-		response = fmt.Sprintf("bad format on the dice value")
-		sendToDM = false
+		log.Printf("There was an error converting the number of rolls")
+	}
+
+	if dieInfo[4] != "" {
+		proficiency, err = strconv.Atoi(dieInfo[4])
+		if err != nil {
+			log.Printf("There was an error converting proficiency")
+		}
 	}
 
 	switch dieValue {
@@ -47,29 +58,49 @@ func rollTheDice(message string) (response string, sendToDM bool) {
 		log.Printf("good die value")
 	default:
 		response = fmt.Sprintf("dice are limited to 4,6,8,10,12,20, and 100 sided die")
-		sendToDM = false
 	}
 
 	if rollCount > 10 {
 		response = fmt.Sprintf("rolls are limited to 10 at a time")
-		sendToDM = false
 	}
 
 	log.Printf("rolling a %d sided die %d times", dieValue, rollCount)
-	for i := 0; i < rollCount; i++ {
-		rolls = append(rolls, rand.Intn(dieValue)+1)
-	}
-
-	for rtdi, val := range rolls {
-		response = response + strconv.Itoa(val)
-		if rtdi == len(rolls)-2 {
-			response = response + ", and "
-		} else if rtdi != len(rolls)-1 {
-			response = response + ", "
+	for rtdi, val := range roll(rollCount, dieValue) {
+		prettyRolls = prettyRolls + strconv.Itoa(val)
+		if rtdi == len(roll(rollCount, dieValue))-2 {
+			prettyRolls = prettyRolls + ", and "
+		} else if rtdi != len(roll(rollCount, dieValue))-1 {
+			prettyRolls = prettyRolls + ", "
 		}
 	}
 
-	response = response + fmt.Sprintf(" for a total of %d", total(rolls))
+	rollTotal := total(roll(rollCount, dieValue))
+
+	if dieInfo[3] == "" || dieInfo[4] == "" {
+		log.Printf("No profeciency was added to the roll")
+	} else {
+		if dieInfo[3] == "+" {
+			log.Printf("Adding %d to the roll", proficiency)
+			rollTotal = rollTotal + proficiency
+			profString = fmt.Sprintf("adding %d ", proficiency)
+		} else if dieInfo[3] == "-" {
+			log.Printf("subtracting %d to the roll", proficiency)
+			rollTotal = rollTotal - proficiency
+			profString = fmt.Sprintf("subtracting %d ", proficiency)
+		} else {
+
+		}
+	}
+
+	response = fmt.Sprintf("I have rolled %s %sfor a total of %d", prettyRolls, profString, rollTotal)
+
+	return
+}
+
+func roll(rollCount int, dieValue int) (rolls []int) {
+	for i := 0; i < rollCount; i++ {
+		rolls = append(rolls, rand.Intn(dieValue)+1)
+	}
 
 	return
 }
