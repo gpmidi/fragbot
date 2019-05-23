@@ -32,7 +32,11 @@ func rollTheDice(message string) (response string, sendToDM bool) {
 
 	log.Printf("roll the dice")
 	// Example !roll 1d6+2
-	validID, _ := regexp.Compile(`(\d+)\s?d\s?(\d+)\s?(?:(\+|\-)\s?(\d*))?`)
+	validID, err := regexp.Compile(`(\d+)\s?d\s?(\d+)\s?(?:(\+|\-)\s?(\d*))?`)
+	if err != nil {
+		log.Printf("There was an error compiling the regex for the roll command")
+		return
+	}
 
 	dieInfo := validID.FindStringSubmatch(message)
 
