@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -42,6 +43,11 @@ func lookingForGroupInit() {
 func lookingForGroup(message string, authorID string, authorName string) (response string, sendToDM bool) {
 	// easier to set an error var now
 	var err error
+
+	// vars for lfg
+	var game string
+	var platform string
+	var timeInt int
 
 	if message == "leave" {
 		log.Printf("removing user from the lfg queue")
@@ -85,7 +91,12 @@ func lookingForGroup(message string, authorID string, authorName string) (respon
 			if len(plat.Games) != 0 {
 			}
 			for _, platGame := range plat.Games {
-				codeBlock.Message = append(codeBlock.Message, fmt.Sprintf("%s%s%s", pad.Left("", 12, " "), pad.Right(platGame.Title, 22, " "), strings.Join(platGame.Players, ", ")))
+				gameTitle := platGame.Title
+				if len(platGame.Title) > 22 {
+					log.Printf("Truncating string")
+					gameTitle = platGame.Title[:21]
+				}
+				codeBlock.Message = append(codeBlock.Message, fmt.Sprintf("%s%s%s", pad.Left("", 12, " "), pad.Right(gameTitle, 22, " "), strings.Join(platGame.Players, ", ")))
 			}
 		}
 
@@ -96,60 +107,36 @@ func lookingForGroup(message string, authorID string, authorName string) (respon
 		return response, false
 	}
 
-	lfgQuery := strings.Split(message, " ")
-
-	// platform from the command
-	var platform string
-	// game from the command
-	var gameArray []string
-	var game string
-
-	// time variables because reasons
-	var timeStr string
-	var timeInt int
-
-	// get full game name before platform
-	for i, word := range lfgQuery {
-		// loop until you see a platform name
-		if contains(chn.LFG.Platforms, word) {
-			platform = word
-			// set time as next value after platform
-			if i == len(lfgQuery)+1 {
-				log.Printf("no time sent with message")
-			} else {
-				timeStr = lfgQuery[i+1]
-			}
-			break
-		}
-		gameArray = append(gameArray, word)
+	validID, err := regexp.Compile(`([a-zA-Z]+\d?|[a-zA-Z]+(?:[[:punct:]])+(?:\s?)|[a-zA-Z]+(?:\s?))+(?:\s?)(\d+|$)`)
+	if err != nil {
+		log.Printf("There was an error compiling the regex for the lfg command")
+		return
 	}
 
-	game = strings.Join(gameArray, " ")
+	lfgQuery := validID.FindStringSubmatch(message)
 
-	// if no game or no platform specified
-	if platform == "" {
-		return fmt.Sprintf("no platform specified that is recognized, I support the following platforms: %s", strings.Join(chn.LFG.Platforms, ", ")), false
+	if lfgQuery[2] == "" {
+		game = strings.TrimSuffix(lfgQuery[0], fmt.Sprintf(" %s", lfgQuery[1]))
+		platform = lfgQuery[1]
+		timeInt = 60
+	} else {
+		game = strings.TrimSuffix(lfgQuery[0], fmt.Sprintf(" %s %s", lfgQuery[1], lfgQuery[2]))
+		platform = lfgQuery[1]
+		log.Printf("setting timeInt to %s", lfgQuery[2])
+		timeInt, err = strconv.Atoi(lfgQuery[2])
+		if err != nil {
+			return fmt.Sprintf("bad format on the time to wait"), false
+		}
 	}
 
 	if game == "" {
 		return fmt.Sprintf("no game specified"), false
 	}
 
-	// time stuff
-	if timeStr == "" {
-		// if no time was specifiec
-		log.Printf("no time specified defaulting to 60 minutes")
-		timeInt = 60
-	} else {
-		// set time to lenght specified
-		log.Printf("setting timeInt to %s", timeStr)
-		timeInt, err = strconv.Atoi(timeStr)
-		if err != nil {
-			return fmt.Sprintf("bad format on the time to wait"), false
-		}
+	// if no game or no platform specified
+	if platform == "" {
+		return fmt.Sprintf("no platform specified that is recognized, I support the following platforms: %s", strings.Join(chn.LFG.Platforms, ", ")), false
 	}
-
-	// log.Printf("%d", timeInt)
 
 	log.Printf("updating player info")
 	// player functions
