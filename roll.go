@@ -66,6 +66,7 @@ func rollTheDice(message string) (response string, sendToDM bool) {
 
 	if rollCount > 10 {
 		response = fmt.Sprintf("rolls are limited to 10 at a time")
+		return
 	}
 
 	log.Printf("rolling a %d sided die %d times", dieValue, rollCount)
