@@ -209,14 +209,14 @@ func handleDiscordMessages(s *discordgo.Session, message *discordgo.MessageCreat
 		var sendToDM bool
 		if strings.HasPrefix(messageContent, chn.Prefix+"lfg") && message.ChannelID == chn.LFG.ChannelID {
 			if strings.TrimPrefix(messageContent, chn.Prefix+"lfg") == "" || !strings.HasPrefix(messageContent, chn.Prefix+"lfg ") {
-				sendDiscordMessage(s, channel.ID, "How to use Fragfinder v1.0\n`!lfg (Game) (Platform) (Wait Time in minutes (Default is 60 if not set))`")
+				sendDiscordMessage(s, channel.ID, "How to use Fragfinder v1.0\n`!lfg (Game) (Platform) (Wait Time in minutes (Default is 60 if not set))\nI.E. `!lfg Rocket League PS4 60`")
 				return
 			}
 			response, sendToDM = lookingForGroup(strings.TrimPrefix(messageContent, chn.Prefix+"lfg "), message.Author.ID, message.Author.Username)
 		}
 		if strings.HasPrefix(messageContent, chn.Prefix+"roll") && message.ChannelID == chn.RTD.ChannelID {
 			if strings.TrimPrefix(messageContent, chn.Prefix+"roll") == "" || !strings.HasPrefix(messageContent, chn.Prefix+"roll ") {
-				sendDiscordMessage(s, channel.ID, "How to use Fragfinder v1.0\n`!lfg (Game) (Platform) (Wait Time in minutes (Default is 60 if not set))`")
+				sendDiscordMessage(s, channel.ID, "How to use Roll the Dice\n`!roll (dice)d(sides)[+/-][proficiency]`\nI.E. `!roll 1d20+3`")
 				return
 			}
 			response, sendToDM = rollTheDice(strings.TrimPrefix(messageContent, chn.Prefix+"roll "))
@@ -256,6 +256,15 @@ func sendDiscordDirectMessage(s *discordgo.Session, discordUserID string, respon
 		return
 	}
 	sendDiscordMessage(s, channel.ID, response)
+}
+
+func sendDiscordEmbed(s *discordgo.Session, embed *discordgo.MessageEmbed, channelID string) {
+	log.Printf("sending embed to %s", channelID)
+	_, err := s.ChannelMessageSendEmbed(channelID, embed)
+	if err != nil {
+		log.Printf("error creating direct message channel: %s", err)
+		return
+	}
 }
 
 func newCodeBlock() discordCodeBlock {
