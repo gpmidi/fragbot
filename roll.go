@@ -15,6 +15,10 @@ import (
 //  / /  / /_/ / / /_____/ /_/ / / /  __/_____/ /_/ / / /__/  __/
 // /_/   \____/_/_/      \__/_/ /_/\___/      \__,_/_/\___/\___/
 
+type rtdInfo struct {
+	ChannelID string `json:"channel_id,omitempty"`
+}
+
 func rollTheDiceInit() {
 }
 

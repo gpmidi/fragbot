@@ -18,6 +18,37 @@ import (
 // /_/\____/\____/_/|_/_/_/ /_/\__, /     /_/  \____/_/         \__, /_/   \____/\__,_/ .___/
 //                            /____/                           /____/                /_/
 
+type lfgInfo struct {
+	ChannelID string   `json:"channel_id,omitempty"`
+	Platforms []string `json:"platforms,omitempty"`
+}
+
+type platforms struct {
+	Platforms []platformInfo `json:"platforms"`
+}
+
+type platformInfo struct {
+	Name  string     `json:"platform_type"`
+	Games []gameInfo `json:"game,omitempty"`
+}
+
+type gameInfo struct {
+	Title   string   `json:"game_title"`
+	Players []string `json:"game_players,omitempty"`
+}
+
+type players struct {
+	Players []playerInfo `json:"players,omitempty"`
+}
+
+type playerInfo struct {
+	DiscordID string `json:"discord_id"`
+	Game      string `json:"game,omitempty"`
+	Name      string `json:"player_name"`
+	Platform  string `json:"platform,omitempty"`
+	Until     int64  `json:"look_until"`
+}
+
 func lookingForGroupInit() {
 	var err error
 
