@@ -18,6 +18,11 @@ import (
 // /_/\____/\____/_/|_/_/_/ /_/\__, /     /_/  \____/_/         \__, /_/   \____/\__,_/ .___/
 //                            /____/                           /____/                /_/
 
+var (
+	users   players
+	platfms platforms
+)
+
 type lfgInfo struct {
 	ChannelID string   `json:"channel_id,omitempty"`
 	Platforms []string `json:"platforms,omitempty"`

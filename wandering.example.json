@@ -1,0 +1,311 @@
+{
+    "wandering_damage":{
+        "roll":{
+            "dice": 1,
+            "value": 20
+        },
+        "table":[
+            {
+                "outcome": {
+                    "exact": 1
+                },
+                "result":"Your character has fallen down a flight of stairs; roll his dexterity or less on percentile dice, or else consult Limb Loss Subtable.",
+                "limb": true
+            },
+            {
+                "outcome": {
+                    "exact": 2
+                },
+                "result":"The monster your character just killed gets up and attacks him, doing 8-80 points of damage.",
+                "roll":{
+                    "dice": 8,
+                    "value": 10
+                },
+                "damage": true
+            },
+            {
+                "outcome": {
+                    "exact": 3
+                },
+                "result":"Your character smells smoke; his right arm is on fire. Take 14 points of damage and save vs. gangrene."
+            },
+            {
+                "outcome": {
+                    "exact": 4
+                },
+                "result":"Your character cuts himself while shaving; consult Limb Loss Subtable.",
+                "limb":true
+            },
+            {
+                "outcome": {
+                    "exact": 5
+                },
+                "result":"Your character's nose hairs catch fire and he dies of smoke inhalation."
+            },
+            {
+                "outcome": {
+                    "exact": 6
+                },
+                "result":"Your character stumbles backward into a yawning chasm and disappears from view."
+            },
+            {
+                "outcome": {
+                    "exact": 7
+                },
+                "result":"The next time your character says something, he eats his words, chokes on them, and dies."
+            },
+            {
+                "outcome": {
+                    "exact": 8
+                },
+                "result":"Something cuts your character's nose off, doing 2-12 points damage and really messing up his charisma.",
+                "roll":{
+                    "dice": 2,
+                    "value": 6
+                },
+                "damage": true
+            },
+            {
+                "outcome": {
+                    "exact": 9
+                },
+                "result":"Your character steps on a piece of glass; consult Limb Loss Subtable.",
+                "limb": true
+            },
+            {
+                "outcome": {
+                    "exact": 10
+                },
+                "result":"Your character suddenly catches a severe case of brain death."
+            },
+            {
+                "outcome": {
+                    "exact": 11
+                },
+                "result":"Something invisible chews on your character, doing 6-36 points damage.",
+                "roll":{
+                    "dice": 6,
+                    "value": 6
+                },
+                "damage": true
+            },
+            {
+                "outcome": {
+                    "exact": 12
+                },
+                "result":"Your character develops an incredibly severe case of arthritis and can grasp nothing with his hands; he drops anything he's holding - and if that happened to be a sword or an axe, consult the Limb Loss Subtable.",
+                "limb": true
+            },
+            {
+                "outcome": {
+                    "range":{
+                        "min": 13,
+                        "max": 20
+                    }
+                },
+                "result":"Consult the Random Damage Subtable for no reason whatsoever.",
+                "random": true
+            }
+        ]
+    },
+    "limb_loss":{
+        "roll":{
+            "dice": 1,
+            "value": 6
+        },
+        "table":[
+            {
+                "outcome": {
+                    "exact": 1
+                },
+                "result":"your character has lost their left leg."
+            },
+            {
+                "outcome": {
+                    "exact": 2
+                },
+                "result":"your character has lost their right leg."
+            },
+            {
+                "outcome": {
+                    "exact": 3
+                },
+                "result":"your character has lost their left arm."
+            },
+            {
+                "outcome": {
+                    "exact": 4
+                },
+                "result":"your character has lost their right arm."
+            },
+            {
+                "outcome": {
+                    "exact": 5
+                },
+                "result":"your character has lost their head"
+            },
+            {
+                "outcome": {
+                    "exact": 6
+                },
+                "result":"your character has cut their torso in half."
+            }
+        ]
+    },
+    "random_damage":{
+        "roll":{
+            "dice": 1,
+            "value": 100
+        },
+        "table":[
+            {
+                "outcome":{
+                    "range":{
+                        "min": 1,
+                        "max": 5
+                    }
+                },
+                "result": "Take 10 hit points damage."
+            },
+            {
+                "outcome":{
+                    "range":{
+                        "min": 6,
+                        "max": 10
+                    }
+                },
+                "result": "Take 15 hit points damage."
+            },
+            {
+                "outcome":{
+                    "range":{
+                        "min": 11,
+                        "max": 20
+                    }
+                },
+                "result": "Take 30 hit points damage."
+            },
+            {
+                "outcome":{
+                    "range":{
+                        "min": 21,
+                        "max": 25
+                    }
+                },
+                "result": "Take 10 hit points damage and consult Limb Loss Subtable, modifying die roll by +5.",
+                "limb": true
+            },
+            {
+                "outcome":{
+                    "range":{
+                        "min": 26,
+                        "max": 30
+                    }
+                },
+                "result": "Take 10 hit points damage and roll again on Wandering Damage System Matrix.",
+                "wander": true
+            },
+            {
+                "outcome":{
+                    "range":{
+                        "min": 31,
+                        "max": 35
+                    }
+                },
+                "result": "Take 15 hit points damage and then take 30 more."
+            },
+            {
+                "outcome":{
+                    "range":{
+                        "min": 36,
+                        "max": 40
+                    }
+                },
+                "result": "Roll every die you own for damage."
+            },
+            {
+                "outcome":{
+                    "range":{
+                        "min": 41,
+                        "max": 45
+                    }
+                },
+                "result": "Take 17 hit points damage"
+            },
+            {
+                "outcome":{
+                    "range":{
+                        "min": 46,
+                        "max": 50
+                    }
+                },
+                "result": "Take 42 hit points damage."
+            },
+            {
+                "outcome":{
+                    "range":{
+                        "min": 51,
+                        "max": 55
+                    }
+                },
+                "result": "Multiply your character's age by 5. Take three times that much damage."
+            },
+            {
+                "outcome":{
+                    "range":{
+                        "min": 56,
+                        "max": 60
+                    }
+                },
+                "result": "Take 24 hit points damage and then take 31 more."
+            },
+            {
+                "outcome":{
+                    "range":{
+                        "min": 61,
+                        "max": 65
+                    }
+                },
+                "result": "Take 1,000 hit points damage and roll again.",
+                "random": true
+            },
+            {
+                "outcome":{
+                    "range":{
+                        "min": 66,
+                        "max": 70
+                    }
+                },
+                "result": "Roll every die within 30 feet for damage."
+            },
+            {
+                "outcome":{
+                    "range":{
+                        "min": 71,
+                        "max": 73
+                    }
+                },
+                "result": "Add up the total hit points of everyone in the party. Take that much damage."
+            },
+            {
+                "outcome":{
+                    "range":{
+                        "min": 74,
+                        "max": 75
+                    }
+                },
+                "result": "Take 3 hit points damage and consider yourself very lucky - for the time being."
+            },
+            {
+                "outcome":{
+                    "range":{
+                        "min": 76,
+                        "max": 100
+                    }
+                },
+                "result": "What? You didn't get hurt? That's impossible - this system is foolproof. Roll again.",
+                "random": true
+            }
+        ]
+    }
+}

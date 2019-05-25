@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -16,12 +17,60 @@ import (
 //  / /  / /_/ / / /_____/ /_/ / / /  __/_____/ /_/ / / /__/  __/
 // /_/   \____/_/_/      \__/_/ /_/\___/      \__,_/_/\___/\___/
 
+var (
+	wanderingInfo wanderingDamage
+)
+
 type rtdInfo struct {
 	ChannelID string `json:"channel_id,omitempty"`
 	Sides     []int  `json:"sides,omitempty"`
 }
 
+type wanderingDamage struct {
+	LimbLoss        wandering `json:"limb_loss"`
+	WanderingDamage wandering `json:"wandering_damage"`
+	RandomDamage    wandering `json:"random_damage"`
+}
+
+type wandering struct {
+	Roll  wanderingRoll    `json:"roll"`
+	Table []wanderingTable `json:"table"`
+}
+
+type wanderingRoll struct {
+	Dice  int `json:"dice"`
+	Value int `json:"value"`
+}
+
+type wanderingTable struct {
+	Outcome rollOutcome   `json:"outcome,omitempty"`
+	Result  string        `json:"result"`
+	Roll    wanderingRoll `json:"roll,omitempty"`
+	Limb    bool          `json:"limb,omitempty"`
+	Wander  bool          `json:"wander,omitempty"`
+	Random  bool          `json:"random,omitempty"`
+	Damage  bool          `json:"damage,omitempty"`
+}
+
+type rollOutcome struct {
+	Exact int              `json:"exact,omitempty"`
+	Range rollOutcomeRange `json:"range,omitempty"`
+}
+
+type rollOutcomeRange struct {
+	Min int `json:"min"`
+	Max int `json:"max"`
+}
+
 func rollTheDiceInit() {
+	var err error
+
+	log.Printf("loading wandering damage info")
+	err = loadInfo("wandering.json", &wanderingInfo)
+	if err != nil {
+		log.Fatalf("there was an issue reading the wandering file\n")
+	}
+	log.Printf("wandering damage info loaded")
 }
 
 func rollTheDice(message string) (response string, sendToDM bool) {
@@ -139,9 +188,86 @@ func rollDie(addSub string, dieValue, rollCount, proficiency int) (response stri
 	return
 }
 
-func total(dice []int) (total int) {
-	for _, die := range dice {
-		total = total + die
+func rollWandering() (response string, sendToDM bool, leave bool) {
+
+	var outcome int
+	var damage int
+
+	var wander bool
+	var exit bool
+
+	rolls := roll(wanderingInfo.WanderingDamage.Roll.Dice, wanderingInfo.WanderingDamage.Roll.Value)
+
+	for val := range rolls {
+		outcome = outcome + val
+	}
+
+	// this should never happen. If it does let me know...
+	if outcome == 0 {
+		log.Printf("If you ever log this line please open a github issue...")
+		response, sendToDM, leave = rollWandering()
+		return
+	}
+
+	for _, value := range wanderingInfo.WanderingDamage.Table {
+		if value.Outcome.Exact == outcome || value.Outcome.Range.Max >= outcome || outcome >= value.Outcome.Range.Min {
+			response = value.Result
+			if value.Limb {
+				response = response + rollLimbLoss()
+			} else if value.Random {
+
+			} else if value.Damage {
+				rolls = roll(value.Roll.Dice, value.Roll.Value)
+				for val := range rolls {
+					damage = damage + val
+				}
+				response = strings.Replace(value.Result, "&damage&", strconv.Itoa(damage), -1)
+			} else if value.Wander {
+				wander = value.Wander
+			}
+			exit = true
+		}
+
+		if !wander {
+			leave = true
+		}
+
+		if exit {
+			break
+		}
+	}
+
+	return
+}
+
+func rollLimbLoss() (result string) {
+	var outcome int
+
+	rolls := roll(wanderingInfo.LimbLoss.Roll.Dice, wanderingInfo.LimbLoss.Roll.Value)
+
+	for val := range rolls {
+		outcome = outcome + val
+	}
+
+	for _, value := range wanderingInfo.LimbLoss.Table {
+		if value.Outcome.Exact == 0 {
+		} else if value.Outcome.Exact == outcome {
+			result = value.Result
+		} else if value.Outcome.Range.Max >= outcome || outcome >= value.Outcome.Range.Min {
+			result = value.Result
+		}
+	}
+
+	return
+}
+
+func rollRandom() {
+
+}
+
+func roll(rollCount int, dieValue int) (rolls []int) {
+	for i := 0; i < rollCount; i++ {
+		rolls = append(rolls, rand.Intn(dieValue)+1)
 	}
 
 	return

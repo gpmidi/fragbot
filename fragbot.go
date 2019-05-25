@@ -17,8 +17,6 @@ import (
 var (
 	bot      botConfig
 	chn      channelConfig
-	users    players
-	platfms  platforms
 	shutdown = make(chan string)
 	//ServStat is the Service Status channel
 	servStat = make(chan string)
@@ -182,6 +180,16 @@ func handleDiscordMessages(s *discordgo.Session, message *discordgo.MessageCreat
 		if strings.HasPrefix(messageContent, chn.Prefix+"roll") && message.ChannelID == chn.RTD.ChannelID {
 			if strings.TrimPrefix(messageContent, chn.Prefix+"roll") == "" || !strings.HasPrefix(messageContent, chn.Prefix+"roll ") {
 				sendDiscordMessage(s, channel.ID, "How to use Roll the Dice\n`!roll (dice)d(sides)[+/-][proficiency]`\nI.E. `!roll 1d20+3`")
+				return
+			}
+			if strings.TrimPrefix(messageContent, chn.Prefix+"roll ") == "wandering damage" {
+				var leave bool
+				for !leave {
+					response, sendToDM, leave = rollWandering()
+					if !leave {
+						sendDiscordMessage(s, channel.ID, response)
+					}
+				}
 				return
 			}
 			response, sendToDM = rollTheDice(strings.TrimPrefix(messageContent, chn.Prefix+"roll "))
