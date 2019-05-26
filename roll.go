@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"reflect"
 	"regexp"
 	"strconv"
 	"time"
@@ -17,6 +18,7 @@ import (
 
 type rtdInfo struct {
 	ChannelID string `json:"channel_id,omitempty"`
+	Sides     []int  `json:"sides,omitempty"`
 }
 
 func rollTheDiceInit() {
@@ -25,18 +27,17 @@ func rollTheDiceInit() {
 func rollTheDice(message string) (response string, sendToDM bool) {
 	var err error
 
-	// rolls that are sent back
-	var prettyRolls string
-
 	// a users proficiency
 	var proficiency int
-	var profString string
+
+	// if a roll is to be run multiple times
+	multiRoll := 1
 
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	log.Printf("roll the dice")
 	// Example !roll 1d6+2
-	validID, err := regexp.Compile(`(\d+)\s?d\s?(\d+)\s?(?:(\+|\-)\s?(\d*))?`)
+	validID, err := regexp.Compile(`(\d+)\s?d\s?(\d+)\s?(?:(\+|\-)\s?(\d*))?(?:(?:x)(\d*)|)`)
 	if err != nil {
 		log.Printf("There was an error compiling the regex for the roll command")
 		return
@@ -61,11 +62,8 @@ func rollTheDice(message string) (response string, sendToDM bool) {
 		}
 	}
 
-	switch dieValue {
-	case 4, 6, 8, 10, 12, 20, 100:
-		log.Printf("good die value")
-	default:
-		response = fmt.Sprintf("dice are limited to 4,6,8,10,12,20, and 100 sided die")
+	if !hasElem(chn.RTD.Sides, dieValue) {
+		response = fmt.Sprintf("Only dice with %s sides are supported.", arrayToString(chn.RTD.Sides))
 		return
 	}
 
@@ -74,38 +72,23 @@ func rollTheDice(message string) (response string, sendToDM bool) {
 		return
 	}
 
-	log.Printf("rolling a %d sided die %d times", dieValue, rollCount)
-	allRolls := roll(rollCount, dieValue)
-	for rtdi, val := range allRolls {
-		prettyRolls = prettyRolls + strconv.Itoa(val)
-		if rtdi == len(allRolls)-2 {
-			prettyRolls = prettyRolls + ", and "
-		} else if rtdi != len(allRolls)-1 {
-			prettyRolls = prettyRolls + ", "
+	if dieInfo[5] != "" {
+		log.Printf("rolling %s sets", dieInfo[5])
+		multiRoll, err = strconv.Atoi(dieInfo[5])
+		if err != nil {
+			log.Printf("There was an error converting the number of rolls")
 		}
+		response = fmt.Sprintf("I have rolled %d sets of rolls for you coming out with \n", multiRoll)
 	}
 
-	rollTotal := total(allRolls)
-
-	log.Printf("%d", rollTotal)
-
-	if dieInfo[3] == "" || dieInfo[4] == "" {
-		log.Printf("No profeciency was added to the roll")
-	} else {
-		if dieInfo[3] == "+" {
-			log.Printf("Adding %d to the roll", proficiency)
-			rollTotal = rollTotal + proficiency
-			profString = fmt.Sprintf("adding %d ", proficiency)
-		} else if dieInfo[3] == "-" {
-			log.Printf("subtracting %d to the roll", proficiency)
-			rollTotal = rollTotal - proficiency
-			profString = fmt.Sprintf("subtracting %d ", proficiency)
-		} else {
-
-		}
+	if multiRoll > 5 {
+		response = fmt.Sprintf("Sorry I only support up to 5 sets of rolls.")
+		return
 	}
 
-	response = fmt.Sprintf("I have rolled %s %sfor a total of %d", prettyRolls, profString, rollTotal)
+	for i := 1; i <= multiRoll; i++ {
+		response = response + rollDie(dieInfo[3], dieValue, rollCount, proficiency)
+	}
 
 	return
 }
@@ -118,10 +101,72 @@ func roll(rollCount int, dieValue int) (rolls []int) {
 	return
 }
 
+func rollDie(addSub string, dieValue, rollCount, proficiency int) (response string) {
+	// strings that are sent back
+	var prettyRolls string
+	var profString string
+
+	log.Printf("rolling a %d sided die %d times", dieValue, rollCount)
+	allRolls := roll(rollCount, dieValue)
+	prettyRolls = arrayToString(allRolls)
+
+	rollTotal := total(allRolls)
+
+	log.Printf("%d", rollTotal)
+
+	if addSub == "" {
+		log.Printf("No profeciency was added to the roll")
+	} else {
+		if addSub == "+" {
+			log.Printf("Adding %d to the roll", proficiency)
+			rollTotal = rollTotal + proficiency
+			profString = fmt.Sprintf("adding %d ", proficiency)
+		} else if addSub == "-" {
+			log.Printf("subtracting %d to the roll", proficiency)
+			rollTotal = rollTotal - proficiency
+			profString = fmt.Sprintf("subtracting %d ", proficiency)
+		} else {
+
+		}
+	}
+
+	response = fmt.Sprintf("I have rolled %s %sfor a total of %d \n", prettyRolls, profString, rollTotal)
+
+	return
+}
+
 func total(dice []int) (total int) {
 	for _, die := range dice {
 		total = total + die
 	}
 
 	return
+}
+
+func arrayToString(intArray []int) (pretty string) {
+	for rtdi, val := range intArray {
+		pretty = pretty + strconv.Itoa(val)
+		if rtdi == len(intArray)-2 {
+			pretty = pretty + ", and "
+		} else if rtdi != len(intArray)-1 {
+			pretty = pretty + ", "
+		}
+	}
+
+	return
+}
+
+// if array has an element
+func hasElem(array interface{}, elem interface{}) bool {
+	arrV := reflect.ValueOf(array)
+
+	if arrV.Kind() == reflect.Slice {
+		for i := 0; i < arrV.Len(); i++ {
+			if arrV.Index(i).Interface() == elem {
+				return true
+			}
+		}
+	}
+
+	return false
 }
