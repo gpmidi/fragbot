@@ -66,6 +66,7 @@ func rollTheDice(message string) (response string, sendToDM bool) {
 		log.Printf("good die value")
 	default:
 		response = fmt.Sprintf("dice are limited to 4,6,8,10,12,20, and 100 sided die")
+		return
 	}
 
 	if rollCount > 10 {
