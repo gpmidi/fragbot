@@ -37,7 +37,7 @@ func rollTheDice(message string) (response string, sendToDM bool) {
 
 	log.Printf("roll the dice")
 	// Example !roll 1d6+2
-	validID, err := regexp.Compile(`(\d+)\s?d\s?(\d+)\s?(?:(\+|\-)\s?(\d*))?(?:(?:x)(\d*)|)`)
+	validID, err := regexp.Compile(`(\d+)\s?d\s?(\d+)\s?(?:(\+|\-)\s?(\d*))?(?:\s?(?:x\s?)(\d*)|)`)
 	if err != nil {
 		log.Printf("There was an error compiling the regex for the roll command")
 		return
