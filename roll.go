@@ -45,14 +45,18 @@ func rollTheDice(message string) (response string, sendToDM bool) {
 
 	dieInfo := validID.FindStringSubmatch(message)
 
-	dieValue, err := strconv.Atoi(dieInfo[2])
-	if err != nil {
-		log.Printf("There was an error converting the number of sides")
+	if len(dieInfo) == 0 {
+		return
 	}
 
 	rollCount, err := strconv.Atoi(dieInfo[1])
 	if err != nil {
 		log.Printf("There was an error converting the number of rolls")
+	}
+
+	dieValue, err := strconv.Atoi(dieInfo[2])
+	if err != nil {
+		log.Printf("There was an error converting the number of sides")
 	}
 
 	if dieInfo[4] != "" {

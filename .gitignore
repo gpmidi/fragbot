@@ -15,4 +15,5 @@ channel.json
 config.json
 lfg_platforms.json
 lfg_users.json
+wandering.json
 \.vscode/
