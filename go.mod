@@ -8,7 +8,9 @@ require (
 	github.com/codegangsta/negroni v1.0.0 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/gorilla/mux v1.7.1 // indirect
+	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/satori/go.uuid v1.2.0 // indirect
+	github.com/sirupsen/logrus v1.4.2
 	github.com/willf/pad v0.0.0-20190207183901-eccfe5d84172
 	golang.org/x/sys v0.0.0-20190426135247-a129542de9ae // indirect
 	gopkg.in/fsnotify.v1 v1.4.7 // indirect

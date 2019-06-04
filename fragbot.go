@@ -23,8 +23,14 @@ var (
 )
 
 type botConfig struct {
-	Token string `json:"token"`
-	Game  string `json:"game,omitempty"`
+	Token string    `json:"token"`
+	Game  string    `json:"game,omitempty"`
+	Log   logConfig `json:"log,omitempty"`
+}
+
+type logConfig struct {
+	Level   string `json:"level,omitempty"`
+	FileLoc string `json:"file,omitempty"`
 }
 
 type channelConfig struct {
@@ -183,13 +189,14 @@ func handleDiscordMessages(s *discordgo.Session, message *discordgo.MessageCreat
 				return
 			}
 			if strings.TrimPrefix(messageContent, chn.Prefix+"roll ") == "wandering damage" {
-				var leave bool
-				for !leave {
-					response, sendToDM, leave = rollWandering()
-					if !leave {
+				var reroll = true
+				for reroll {
+					response, sendToDM, reroll = rollWandering()
+					if reroll {
 						sendDiscordMessage(s, channel.ID, response)
 					}
 				}
+				sendDiscordMessage(s, channel.ID, response)
 				return
 			}
 			response, sendToDM = rollTheDice(strings.TrimPrefix(messageContent, chn.Prefix+"roll "))
