@@ -90,6 +90,7 @@ func rollTheDice(message string) (response string, sendToDM bool) {
 	dieInfo := validID.FindStringSubmatch(message)
 
 	if len(dieInfo) == 0 {
+		response = "How to use Roll the Dice\n`!roll (dice)d(sides)[+/- proficiency][x multiple swings/blows]`\nI.E. `!roll 1d20+3`"
 		return
 	}
 
@@ -209,7 +210,16 @@ func rollWandering() (response string, sendToDM bool, reroll bool) {
 				log.Printf("rolling for limb loss")
 				response = response + rollLimbLoss()
 			} else if value.Random {
-				log.Printf("rolling on the random damage table")
+				var reroll = true
+				for reroll {
+					reroll = false
+					log.Printf("rolling on the random damage table")
+					rollResponse, reroll := rollRandom()
+					response = response + rollResponse
+					if reroll {
+						log.Printf("rerolling for more random damage")
+					}
+				}
 			} else if value.Damage {
 				log.Printf("rolling for damage")
 				rolls = roll(value.Roll.Dice, value.Roll.Value)
@@ -222,12 +232,13 @@ func rollWandering() (response string, sendToDM bool, reroll bool) {
 		}
 	}
 
-	log.Printf("%s", response)
+	log.Printf("response: %s", response)
 
 	return
 }
 
 func rollLimbLoss() (result string) {
+	log.Printf("rolling for limb loss")
 	var outcome int
 
 	rolls := roll(wanderingInfo.LimbLoss.Roll.Dice, wanderingInfo.LimbLoss.Roll.Value)
@@ -236,9 +247,7 @@ func rollLimbLoss() (result string) {
 
 	for _, value := range wanderingInfo.LimbLoss.Table {
 		if value.Outcome.Exact == 0 {
-		} else if value.Outcome.Exact == outcome {
-			result = value.Result
-		} else if value.Outcome.Range.Max >= outcome || outcome >= value.Outcome.Range.Min {
+		} else if value.Outcome.Exact == outcome || between(value.Outcome.Range.Min, value.Outcome.Range.Max, outcome) {
 			result = value.Result
 		}
 	}
@@ -246,26 +255,30 @@ func rollLimbLoss() (result string) {
 	return
 }
 
-func rollRandom() (result string) {
+func rollRandom() (result string, reroll bool) {
+	log.Printf("rolling for random damages")
 	var outcome int
 
-	rolls := roll(wanderingInfo.LimbLoss.Roll.Dice, wanderingInfo.LimbLoss.Roll.Value)
+	rolls := roll(wanderingInfo.RandomDamage.Roll.Dice, wanderingInfo.RandomDamage.Roll.Value)
 
 	outcome = total(rolls)
 
-	for _, value := range wanderingInfo.LimbLoss.Table {
-		if value.Outcome.Exact == 0 {
-		} else if value.Outcome.Exact == outcome {
+	for _, value := range wanderingInfo.RandomDamage.Table {
+		if value.Outcome.Exact == outcome || between(value.Outcome.Range.Min, value.Outcome.Range.Max, outcome) {
 			result = value.Result
-		} else if value.Outcome.Range.Max >= outcome || outcome >= value.Outcome.Range.Min {
-			result = value.Result
+			reroll = value.Random
 		}
 	}
+
+	log.Printf("%s", result)
+	log.Printf("%t", reroll)
 
 	return
 }
 
 func roll(rollCount int, dieValue int) (rolls []int) {
+	log.Printf("rolling a %d sided die %d times", dieValue, rollCount)
+
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	for i := 0; i < rollCount; i++ {
@@ -284,6 +297,8 @@ func arrayToString(intArray []int) (pretty string) {
 			pretty = pretty + ", "
 		}
 	}
+
+	log.Printf("dice total is %d", total)
 
 	return
 }

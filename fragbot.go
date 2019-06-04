@@ -185,7 +185,7 @@ func handleDiscordMessages(s *discordgo.Session, message *discordgo.MessageCreat
 		}
 		if strings.HasPrefix(messageContent, chn.Prefix+"roll") && message.ChannelID == chn.RTD.ChannelID {
 			if strings.TrimPrefix(messageContent, chn.Prefix+"roll") == "" || !strings.HasPrefix(messageContent, chn.Prefix+"roll ") {
-				sendDiscordMessage(s, channel.ID, "How to use Roll the Dice\n`!roll (dice)d(sides)[+/-][proficiency]`\nI.E. `!roll 1d20+3`")
+				sendDiscordMessage(s, channel.ID, "How to use Roll the Dice\n`!roll (dice)d(sides)[+/- proficiency][x multiple swings/blows]`\nI.E. `!roll 1d20+3`")
 				return
 			}
 			if strings.TrimPrefix(messageContent, chn.Prefix+"roll ") == "wandering damage" {
