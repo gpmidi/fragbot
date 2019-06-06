@@ -1,13 +1,14 @@
 package main
 
 import (
+	crand "crypto/rand"
+	"encoding/binary"
 	"fmt"
 	"log"
 	"math/rand"
 	"reflect"
 	"regexp"
 	"strconv"
-	"time"
 )
 
 //                ____      __  __                   ___
@@ -24,6 +25,16 @@ type rtdInfo struct {
 func rollTheDiceInit() {
 }
 
+func getSeed() (int64, error) {
+	c := 8
+	b := make([]byte, c)
+	_, err := rand.Read(b)
+	if err != nil {
+		return 0, err
+	}
+	return (int64)(binary.BigEndian.Uint64(b)), nil
+}
+
 func rollTheDice(message string) (response string, sendToDM bool) {
 	var err error
 
@@ -33,7 +44,11 @@ func rollTheDice(message string) (response string, sendToDM bool) {
 	// if a roll is to be run multiple times
 	multiRoll := 1
 
-	rand.Seed(time.Now().UTC().UnixNano())
+	seed, err := getSeed()
+	if err != nil {
+		log.Print("Error generating seed")
+	}
+	rand.Seed(seed)
 
 	log.Printf("roll the dice")
 	// Example !roll 1d6+2
