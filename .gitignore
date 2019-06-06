@@ -19,3 +19,4 @@ wandering.json
 \.vscode/
 *.iml
 .idea/
+/vendor/
