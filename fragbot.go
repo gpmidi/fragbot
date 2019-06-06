@@ -342,7 +342,9 @@ func saveInfo(file string, v interface{}) error {
 	}
 
 	// log.Printf("writing bytes to file")
-	writeJSONToFile(bytes, file)
+	if err := writeJSONToFile(bytes, file); err != nil {
+		return err
+	}
 
 	return nil
 }
