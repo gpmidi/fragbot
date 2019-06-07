@@ -146,7 +146,7 @@ func startDiscordHandler() {
 	}()
 
 	<-shutdown
-	dg.Close()
+	dg.Close() // Need to capture errors
 	shutdown <- "stopped"
 }
 
@@ -210,7 +210,7 @@ func handleDiscordGuildCreate(s *discordgo.Session, event *discordgo.GuildCreate
 }
 
 func sendDiscordMessage(s *discordgo.Session, channelID string, response string) {
-	s.ChannelMessageSend(channelID, response)
+	s.ChannelMessageSend(channelID, response) // Need to capture errors
 }
 
 func sendDiscordDirectMessage(s *discordgo.Session, discordUserID string, response string) {
@@ -278,7 +278,7 @@ func readJSONFromFile(file string) ([]byte, error) {
 
 	// log.Printf("holding file open\n")
 	// defer the closing of our jsonFile so that we can parse it later on
-	defer jsonFile.Close()
+	defer jsonFile.Close() // Need to capture errors
 
 	// log.Printf("reading file\n")
 	// read our opened xmlFile as a byte array.
@@ -322,7 +322,7 @@ func loadInfo(file string, v interface{}) error {
 	}
 
 	// defer the closing of our jsonFile so that we can parse it later on
-	defer jsonFile.Close()
+	defer jsonFile.Close() // Need to capture errors
 
 	// read our opened xmlFile as a byte array.
 	byteValue, _ := ioutil.ReadAll(jsonFile)

@@ -91,8 +91,8 @@ func lookingForGroup(message string, authorID string, authorName string) (respon
 		}
 		lookingForGroupRemovePlatformPlayer(authorName)
 
-		saveInfo("lfg_platforms.json", platfms)
-		saveInfo("lfg_users.json", users)
+		saveInfo("lfg_platforms.json", platfms) // Need to capture errors
+		saveInfo("lfg_users.json", users)       // Need to capture errors
 		return "you have left the lfg queue", true
 	}
 
@@ -258,8 +258,8 @@ func lookingForGroup(message string, authorID string, authorName string) (respon
 		}
 	}
 
-	saveInfo("lfg_platforms.json", platfms)
-	saveInfo("lfg_users.json", users)
+	saveInfo("lfg_platforms.json", platfms) // Need to capture errors
+	saveInfo("lfg_users.json", users)       // Need to capture errors
 
 	return response, false
 }
@@ -287,8 +287,8 @@ func lookingForGroupTickJob() (response string, discordUserID string, send bool)
 			send = true
 		}
 
-		saveInfo("lfg_platforms.json", platfms)
-		saveInfo("lfg_users.json", users)
+		saveInfo("lfg_platforms.json", platfms) // Need to capture errors
+		saveInfo("lfg_users.json", users)       // Need to capture errors
 	}
 
 	return
