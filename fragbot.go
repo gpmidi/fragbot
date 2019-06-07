@@ -278,7 +278,11 @@ func readJSONFromFile(file string) ([]byte, error) {
 
 	// log.Printf("holding file open\n")
 	// defer the closing of our jsonFile so that we can parse it later on
-	defer jsonFile.Close() // Need to capture errors
+	defer func() {
+		if err := jsonFile.Close(); err != nil {
+			log.Printf("Error while closing JSON file: %v", err)
+		}
+	}()
 
 	// log.Printf("reading file\n")
 	// read our opened xmlFile as a byte array.
@@ -322,7 +326,11 @@ func loadInfo(file string, v interface{}) error {
 	}
 
 	// defer the closing of our jsonFile so that we can parse it later on
-	defer jsonFile.Close() // Need to capture errors
+	defer func() {
+		if err := jsonFile.Close(); err != nil {
+			log.Printf("Error while closing JSON file: %v", err)
+		}
+	}()
 
 	// read our opened xmlFile as a byte array.
 	byteValue, _ := ioutil.ReadAll(jsonFile)
